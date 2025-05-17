@@ -18,7 +18,7 @@ composer require denason/laravel-neshan
 ## ⚙️ پیکربندی
 
 مقادیر کلید API و آدرس پایه API را در فایل `.env` پروژه خود تنظیم کنید:
-
+دریافت کلید دسترسی به API : https://platform.neshan.org/api/getting-started/
 ```env
 NESHAN_STATIC_MAP_API_KEY=کلید-شخصی-شما
 NESHAN_STATIC_MAP_BASE_URL=https://api.neshan.org/v4/static
