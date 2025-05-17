@@ -1,16 +1,14 @@
----
-
 ````markdown
 # 📍 نقشه نشان برای لاراول
 
-یک پکیج  برای اتصال به [API نقشه  نشان](https://developers.neshan.org/api/static) در فریم‌ورک Laravel.  
-براحتی از سرویس های نقشه نشان در پروژه های لاراول خود استفاده کنید
+ پکیج  برای اتصال به نقشه نشان در فریم‌ورک Laravel.  
+ از سرویس‌های نقشه نشان در پروژه‌های لاراول خود استفاده کنید.
 
 ---
 
 ## 🚀 نصب پکیج
 
-از طریق کامپوزر نصب کنید:
+برای نصب پکیج از طریق Composer:
 
 ```bash
 composer require denason/laravel-neshan
@@ -26,14 +24,14 @@ php artisan vendor:publish --tag=config
 
 ## ⚙️ پیکربندی
 
-مقادیر کلید API و آدرس پایه API را در فایل `.env` پروژه قرار دهید:
+مقادیر کلید API و آدرس پایه API را در فایل `.env` پروژه تنظیم کنید:
 
 ```env
 NESHAN_STATIC_MAP_API_KEY=کلید-شخصی-شما
 NESHAN_STATIC_MAP_BASE_URL=https://api.neshan.org/v4/static
 ```
 
-ساختار فایل `config/neshan.php` به این شکل است:
+ساختار فایل `config/neshan.php` به شکل زیر است:
 
 ```php
 'static_map' => [
@@ -46,7 +44,7 @@ NESHAN_STATIC_MAP_BASE_URL=https://api.neshan.org/v4/static
 
 ## ✅ نحوه استفاده
 
-استفاده از **Facade**:
+### استفاده از Facade:
 
 ```php
 use Neshan;
@@ -60,7 +58,7 @@ $image = Neshan::staticMap()->fetchImage($url);
 return response($image)->header('Content-Type', 'image/png');
 ```
 
-یا با استفاده از **Helper**:
+### یا استفاده از Helper:
 
 ```php
 $url = staticMap()->generate(35.6892, 51.3890);
@@ -102,7 +100,7 @@ php artisan test
 
 ## 📝 مجوز
 
-این پکیج با مجوز MIT به‌صورت متن‌باز ارائه شده است.
+این پکیج تحت مجوز MIT و به‌صورت متن‌باز منتشر شده است.
 © توسعه یافته توسط **Denason**
 
 ```
