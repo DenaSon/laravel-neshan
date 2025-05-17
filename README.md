@@ -41,7 +41,7 @@ NESHAN_STATIC_MAP_BASE_URL=https://api.neshan.org/v4/static
 ### استفاده از Facade
 
 ```php
-use Neshan;
+use Denason\Neshan\Facades\Neshan;
 
 $lat = 35.6892;
 $lng = 51.3890;
