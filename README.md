@@ -11,7 +11,9 @@
 
 ```bash
 composer require denason/laravel-neshan
+```
 
+---
 
 ## ⚙️ پیکربندی
 
@@ -21,6 +23,7 @@ composer require denason/laravel-neshan
 NESHAN_STATIC_MAP_API_KEY=کلید-شخصی-شما
 NESHAN_STATIC_MAP_BASE_URL=https://api.neshan.org/v4/static
 ```
+
 
 ساختار فایل پیکربندی `config/neshan.php` به شکل زیر است:
 
