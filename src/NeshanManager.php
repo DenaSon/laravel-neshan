@@ -2,6 +2,7 @@
 
 namespace Denason\Neshan;
 
+use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Contracts\StaticMapInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Application;
@@ -50,4 +51,12 @@ class NeshanManager
     {
         return $this->app->make(StaticMapInterface::class);
     }
+
+    public function Search(): SearchInterface
+    {
+        return $this->app->make(SearchInterface::class);
+    }
+
+
+
 }
