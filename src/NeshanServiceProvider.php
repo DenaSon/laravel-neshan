@@ -36,7 +36,7 @@ class NeshanServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Publish config file
+        // Publish a config file
         $this->publishes([
             __DIR__ . '/Config/neshan.php' => config_path('neshan.php'),
         ], 'config');

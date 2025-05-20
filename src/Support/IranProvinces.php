@@ -35,6 +35,7 @@ class IranProvinces
         'سیستان و بلوچستان' => ['lat' => 29.4963, 'lng' => 60.8629],
         'مرکزی' => ['lat' => 34.0917, 'lng' => 49.6892],
         'خراسان شمالی' => ['lat' => 37.4747, 'lng' => 57.3290],
+        'سمنان' => ['lat' => 35.5744, 'lng' => 53.3973],
     ];
 
     public static function getCoordinates(string $province): ?array

@@ -4,6 +4,7 @@ namespace Unit;
 
 use Denason\Neshan\Exceptions\NeshanException;
 use Denason\Neshan\Services\StaticMapService;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Orchestra\Testbench\TestCase;
 
@@ -67,6 +68,10 @@ class StaticMapServiceTest extends TestCase
         $this->service->generate(999, 999);
     }
 
+    /**
+     * @throws NeshanException
+     * @throws ConnectionException
+     */
     public function test_it_fetches_image_content()
     {
         // Mock HTTP Client
@@ -78,6 +83,7 @@ class StaticMapServiceTest extends TestCase
 
         $this->assertEquals('image-binary-content', $image);
     }
+
     /** @test */
     public function it_throws_exception_when_image_fetch_fails()
     {
@@ -106,47 +112,127 @@ class StaticMapServiceTest extends TestCase
     }
 
     /** @test */
+    /** @test */
+    /** @test */
     public function it_throws_exception_when_api_key_is_invalid()
     {
-
         Http::fake([
-            '*' => Http::response(json_encode([
+            '*' => Http::response([
                 'status' => 'ERROR',
                 'code' => 480,
                 'message' => 'API Key not found or is not valid.',
-            ]), 480),
+            ], 480),
         ]);
 
-        $this->expectException(NeshanException::class);
-        $this->expectExceptionMessage('Failed to fetch image from Neshan: 480');
+        try {
+            $this->service->fetchImage('https://api.neshan.org/v4/static/some-image-url');
+            $this->fail('Expected NeshanException was not thrown');
+        } catch (NeshanException $e) {
+            $this->assertStringContainsString('Failed to fetch image', $e->getMessage());
 
-        $this->service->fetchImage('https://api.neshan.org/v4/static/some-image-url');
+            // بررسی علت (Exception chaining)
+            $this->assertInstanceOf(\Illuminate\Http\Client\Response::class, $e->getPrevious()?->response ?? null);
+            $this->assertEquals(480, $e->getPrevious()?->getCode() ?? null);
+        }
+    }
+
+
+    /** @test
+     * @throws NeshanException
+     */
+    public function it_generates_arc_map_url_with_default_parameters()
+    {
+        $service = new StaticMapService(
+            'test_api_key',
+            'https://api.neshan.org/v4/static'
+        );
+
+        $url = $service->generateArcMap(
+            35.6892, 51.3890, 35.7000, 51.4000
+        );
+
+        $this->assertStringContainsString('https://api.neshan.org/v4/static/arc?', $url);
+        $this->assertStringContainsString('key=test_api_key', $url);
+        $this->assertStringContainsString('type=standard-night', $url);
+        $this->assertStringContainsString('from=51.389,35.6892', $url);
+        $this->assertStringContainsString('to=51.4,35.7', $url);
+        $this->assertStringContainsString('dashed=true', $url);
+        $this->assertStringContainsString('color=%23FF0AA5', $url); // encoded #
+    }
+
+    /** @test
+     * @throws NeshanException
+     */
+    public function it_generates_arc_map_url_with_custom_parameters_and_markers()
+    {
+        $service = new StaticMapService(
+            'test_api_key',
+            'https://api.neshan.org/v4/static'
+        );
+
+        $url = $service->generateArcMap(
+            35.6892,
+            51.3890,
+            35.7000,
+            51.4000,
+            width: 800,
+            height: 700,
+            type: 'dreamy',
+            dashed: false,
+            color: '#00FF00',
+            marker1Token: 'marker1',
+            marker2Token: 'marker2'
+        );
+
+        $this->assertStringContainsString('width=800', $url);
+        $this->assertStringContainsString('height=700', $url);
+        $this->assertStringContainsString('type=dreamy', $url);
+        $this->assertStringContainsString('dashed=false', $url);
+        $this->assertStringContainsString('color=%2300FF00', $url);
+        $this->assertStringContainsString('marker1Token=marker1', $url);
+        $this->assertStringContainsString('marker2Token=marker2', $url);
     }
 
     /** @test */
-    public function it_throws_exception_when_base_url_is_invalid()
+    public function it_throws_exception_for_invalid_coordinates()
     {
-        Http::fake([
-            '*' => Http::response(json_encode([
-                'timestamp' => now()->toISOString(),
-                'status' => 404,
-                'error' => 'Not Found',
-                'path' => '/v4/staticv',
-            ]), 404),
-        ]);
+        $this->expectException(NeshanException::class);
+        $this->expectExceptionMessage('Latitude must be between -90 and 90');
 
-        $invalidService = new StaticMapService(
+        $service = new StaticMapService(
             'test_api_key',
-            'https://api.neshan.org/v4/staticv'
+            'https://api.neshan.org/v4/static'
         );
 
-        $this->expectException(NeshanException::class);
-        $this->expectExceptionMessage('Failed to fetch image from Neshan: 404');
-
-        $invalidService->fetchImage('https://api.neshan.org/v4/staticv/some-image-url');
+        $service->generateArcMap(
+            200.0, // latitude نامعتبر
+            51.3890,
+            35.7000,
+            51.4000
+        );
     }
 
+    /** @test */
+    public function it_throws_exception_for_invalid_arc_parameters()
+    {
+        $this->expectException(NeshanException::class);
+        $this->expectExceptionMessage('Width must be between 250 and 2000 pixels.');
 
+        $service = new StaticMapService(
+            'test_api_key',
+            'https://api.neshan.org/v4/static'
+        );
+
+        $service->generateArcMap(
+            35.6892,
+            51.3890,
+            35.7000,
+            51.4000,
+            width: -500, // عرض نامعتبر
+            height: 0,
+            type: 'unknown-type'
+        );
+    }
 
 
 

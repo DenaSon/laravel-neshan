@@ -4,54 +4,20 @@ namespace Denason\Neshan\Services;
 
 use Denason\Neshan\Contracts\StaticMapInterface;
 use Denason\Neshan\Exceptions\NeshanException;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
+
+
 /**
  * Service to generate and fetch static map images from Neshan API.
  *
  * @package Denason\Neshan\Services
  */
-class StaticMapService implements StaticMapInterface
+class StaticMapService extends BaseNeshanService implements StaticMapInterface
 {
 
     protected string $api_key;
     protected string $base_url;
+    protected array $allowedTypes = ['neshan', 'dreamy', 'standard-day', 'standard-night', 'osm-bright'];
 
-
-    /**
-     * @throws NeshanException
-     */
-    protected function validateParameters(float$lat,float $lng,int $zoom, int $width, int $height,string $type): void
-    {
-
-        if ($lat < -90 || $lat > 90) {
-            throw new NeshanException("Latitude must be between -90 and 90.");
-        }
-
-        if ($lng < -180 || $lng > 180) {
-            throw new NeshanException("Longitude must be between -180 and 180.");
-        }
-
-        $allowedTypes = ['neshan', 'dreamy', 'standard-day', 'standard-night', 'osm-bright'];
-        if (!in_array($type, $allowedTypes)) {
-            throw new NeshanException("Invalid map type: `$type` . Allowed types: " . implode(',', $allowedTypes));
-        }
-
-        // Validate zoom
-        if ($zoom < 4 || $zoom > 19) {
-            throw new NeshanException("Zoom level must be between 4 and 19.");
-        }
-
-        // Validate width
-        if ($width < 250 || $width > 2000) {
-            throw new NeshanException("Width must be between 250 and 2000 pixels.");
-        }
-
-        // Validate height
-        if ($height < 1 || $height > 1200) {
-            throw new NeshanException("Height must be between 1 and 1200 pixels.");
-        }
-    }
 
 
     public function __construct(string $api_key, string $base_url)
@@ -76,8 +42,7 @@ class StaticMapService implements StaticMapInterface
 
     ): string
     {
-        $this->validateParameters($lat, $lng, $zoom, $width, $height, $type);
-
+        $this->validateStaticMapGenerate($lat, $lng, $zoom, $width, $height, $type);
 
         $query = [
             'key' => $this->api_key,
@@ -97,30 +62,74 @@ class StaticMapService implements StaticMapInterface
 
 
     /**
-     * @throws NeshanException|ConnectionException
+     * @throws NeshanException
      */
     public function fetchImage(string $url): string
     {
-        $response = Http::timeout(10)->get($url);
+        return $this->sendSimpleRequest($url);
 
-        if ($response->failed()) {
-
-//            \Log::error('Neshan API error', [
-//                'status' => $response->status(),
-//                'body' => $response->body(),
-//                'url' => $url,
-//            ]);
-
-            throw new NeshanException(
-                "Failed to fetch image from Neshan: {$response->status()} - " . $response->json('message', $response->body())
-
-            );
-        }
-
-        return $response->body();
     }
 
+        /**
+         * Generate a static map with an arc line between two points.
+         *
+         * @throws NeshanException
+         */
+        public
+        function generateArcMap(
+            float   $fromLatitude,
+            float   $fromLongitude,
+            float   $toLatitude,
+            float   $toLongitude,
+            int     $width = 600,
+            int     $height = 600,
+            string  $type = 'standard-night',
+            bool    $dashed = true,
+            string  $color = '#FF0AA5',
+            ?string $marker1Token = null,
+            ?string $marker2Token = null
+        ): string
+        {
+
+            $this->validateCoordinates($fromLatitude, $fromLongitude);
+            $this->validateCoordinates($toLatitude, $toLongitude);
+            $this->validateStaticMapArc($width, $height, $type);
+            $this->validateHexColor($color);
 
 
+            $query = [
+                'key' => $this->api_key,
+                'type' => $type,
+                'from' => "$fromLongitude,$fromLatitude",
+                'to' => "$toLongitude,$toLatitude",
+                'width' => $width,
+                'height' => $height,
+                'dashed' => $dashed ? 'true' : 'false',
+                'color' => $color,
+            ];
 
-}
+
+            if ($marker1Token) {
+                $query['marker1Token'] = $marker1Token;
+            }
+
+            if ($marker2Token) {
+                $query['marker2Token'] = $marker2Token;
+            }
+
+            return $this->base_url . '/arc?' . $this->buildQuery($query);
+
+
+        }
+
+
+        /**
+         * {@inheritdoc}
+         */
+        public
+        function getMapTypes(): array
+        {
+            return $this->allowedTypes;
+        }
+
+    }

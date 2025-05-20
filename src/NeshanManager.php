@@ -2,6 +2,7 @@
 
 namespace Denason\Neshan;
 
+use Denason\Neshan\Contracts\NeshanManagerInterface;
 use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Contracts\StaticMapInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -21,7 +22,7 @@ use Illuminate\Foundation\Application;
  *
  * @package Denason\Neshan
  */
-class NeshanManager
+class NeshanManager implements NeshanManagerInterface
 {
     /**
      * The Laravel application instance.
@@ -41,22 +42,22 @@ class NeshanManager
     }
 
     /**
-     * Get the StaticMap service instance.
-     *
-     * @return StaticMapInterface The service responsible for generating static maps
-     *
-     * @throws BindingResolutionException If the StaticMapInterface cannot be resolved from the container
+     * {@inheritdoc}
+     * @throws BindingResolutionException
      */
     public function staticMap(): StaticMapInterface
     {
         return $this->app->make(StaticMapInterface::class);
     }
 
+    /**
+     * {@inheritdoc}
+     * @throws BindingResolutionException
+     */
     public function Search(): SearchInterface
     {
         return $this->app->make(SearchInterface::class);
     }
-
 
 
 }

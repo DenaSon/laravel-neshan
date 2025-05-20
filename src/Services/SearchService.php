@@ -5,12 +5,28 @@ namespace Denason\Neshan\Services;
 use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Exceptions\NeshanException;
 use Denason\Neshan\Support\IranProvinces;
-use Illuminate\Support\Facades\Http;
 
-class SearchService implements SearchInterface
+
+
+class SearchService extends BaseNeshanService implements SearchInterface
 {
+
+
     protected string $apiKey;
     protected string $baseUrl;
+
+    /**
+     * @throws NeshanException
+     */
+    protected function makeRequest(array $query = []): array
+    {
+        return $this->sendRequest(
+            "{$this->baseUrl}/",
+            $query,
+            ['Api-Key' => $this->apiKey],
+            true // return JSON
+        );
+    }
 
     public function __construct(string $apiKey, string $baseUrl)
     {
@@ -18,20 +34,11 @@ class SearchService implements SearchInterface
         $this->baseUrl = rtrim($baseUrl, '/');
     }
 
-    protected function makeRequest(array $query = []): array
-    {
-        $response = Http::withHeaders([
-            'Api-Key' => $this->apiKey,
-        ])->get("{$this->baseUrl}/",$query);
 
-        if ($response->failed()) {
-            $status = $response->status();
-            $body = $response->body();
-            throw new NeshanException("Request failed with status code {$status}. Response: {$body}", $status);
-        }
+    /**
+     * @throws NeshanException
+     */
 
-        return $response->json();
-    }
 
     /**
      * {@inheritdoc}
@@ -39,6 +46,9 @@ class SearchService implements SearchInterface
      */
     public function findByCoordinate(string $term, ?float $lat = 0, ?float $lng = 0): array
     {
+        $this->validateCoordinates($lat, $lng);
+        $this->validateTermString($term);
+
         return $this->makeRequest([
             'term' => $term,
             'lat' => $lat,
@@ -52,7 +62,7 @@ class SearchService implements SearchInterface
      */
     public function findByProvince(string $term, string $province): array
     {
-        $province = trim($province);
+        $this->validateTermString($term);
         $coordinate = IranProvinces::getCoordinates($province);
 
         if (!$coordinate) {
