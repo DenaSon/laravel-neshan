@@ -15,4 +15,18 @@ interface NeshanManagerInterface
      * @return SearchInterface
      */
     public function search(): SearchInterface;
+
+    /**
+     * Get the address details By Coordinates
+     *
+     * @return ReverseGeocodingInterface
+     */
+    public function reverseGeocoding(): ReverseGeocodingInterface;
+
+    /**
+     * Get the Coordinates By Address string
+     *
+     * @return GeocodingInterface
+     */
+    public function geocoding(): GeocodingInterface;
 }

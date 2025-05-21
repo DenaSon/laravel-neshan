@@ -2,11 +2,14 @@
 
 namespace Denason\Neshan;
 
+use Denason\Neshan\Contracts\GeocodingInterface;
+use Denason\Neshan\Contracts\ReverseGeocodingInterface;
 use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Contracts\StaticMapInterface;
-
-use Denason\Neshan\Services\StaticMapService;
+use Denason\Neshan\Services\GeocodingService;
+use Denason\Neshan\Services\ReverseGeocodingService;
 use Denason\Neshan\Services\SearchService;
+use Denason\Neshan\Services\StaticMapService;
 use Illuminate\Support\ServiceProvider;
 
 class NeshanServiceProvider extends ServiceProvider
@@ -17,16 +20,17 @@ class NeshanServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/Config/neshan.php', 'neshan');
 
         // Register StaticMapService
-        $this->app->singleton(StaticMapInterface::class, function ($app) {
-            $config = config('neshan.static_map');
-            return new StaticMapService($config['api_key'], $config['base_url']);
-        });
+        $this->app->singleton(StaticMapInterface::class, fn() => new StaticMapService(config('neshan.map.api_key')));
 
         // Register SearchService
-        $this->app->singleton(SearchInterface::class, function ($app) {
-            $config = config('neshan.search');
-            return new SearchService($config['api_key'], $config['base_url']);
-        });
+        $this->app->singleton(SearchInterface::class, fn() => new SearchService(config('neshan.service.api_key')));
+
+        // Register ReverseGeocodingService
+        $this->app->singleton(ReverseGeocodingInterface::class, fn() => new ReverseGeocodingService(config('neshan.service.api_key')));
+
+        // Register GeocodingService
+        $this->app->singleton(GeocodingInterface::class, fn() => new GeocodingService(config('neshan.service.api_key')));
+
 
         // Optionally register a manager if using multiple services centrally
         $this->app->singleton(NeshanManager::class, function ($app) {
@@ -47,6 +51,6 @@ class NeshanServiceProvider extends ServiceProvider
         }
 
 
-         $this->loadRoutesFrom(__DIR__ . '/Routes/web.php');
+        $this->loadRoutesFrom(__DIR__ . '/Routes/web.php');
     }
 }

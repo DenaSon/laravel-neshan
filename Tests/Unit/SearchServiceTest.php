@@ -20,7 +20,9 @@ class SearchServiceTest extends TestCase
         $this->service = new SearchService($this->apiKey, $this->baseUrl);
     }
 
-    /** @test */
+    /** @test
+     * @throws NeshanException
+     */
     public function it_returns_results_from_find_by_coordinate()
     {
         Http::fake([
@@ -55,7 +57,7 @@ class SearchServiceTest extends TestCase
         ]);
 
         $this->expectException(NeshanException::class);
-        $this->expectExceptionMessage('Request failed with status code 500');
+        $this->expectExceptionMessage('Unexpected error occurred while requesting Neshan API.');
 
         $this->service->findByCoordinate('پارک', 35.0, 51.0);
     }

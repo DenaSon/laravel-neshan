@@ -5,60 +5,48 @@ namespace Denason\Neshan\Services;
 use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Exceptions\NeshanException;
 use Denason\Neshan\Support\IranProvinces;
-
+use Illuminate\Http\Client\ConnectionException;
 
 
 class SearchService extends BaseNeshanService implements SearchInterface
 {
 
 
-    protected string $apiKey;
-    protected string $baseUrl;
-
     /**
-     * @throws NeshanException
+     * SearchService constructor.
+     *
+     * @param string $apiKey
      */
-    protected function makeRequest(array $query = []): array
+
+    public function __construct(string $apiKey)
     {
-        return $this->sendRequest(
-            "{$this->baseUrl}/",
-            $query,
-            ['Api-Key' => $this->apiKey],
-            true // return JSON
-        );
+
+        parent::__construct($apiKey);
     }
-
-    public function __construct(string $apiKey, string $baseUrl)
-    {
-        $this->apiKey = $apiKey;
-        $this->baseUrl = rtrim($baseUrl, '/');
-    }
-
-
-    /**
-     * @throws NeshanException
-     */
 
 
     /**
      * {@inheritdoc}
-     * @throws NeshanException
+     * @throws NeshanException|ConnectionException
      */
     public function findByCoordinate(string $term, ?float $lat = 0, ?float $lng = 0): array
     {
+        $url = $this->buildEndpoint(static::ENDPOINT_SEARCH);
         $this->validateCoordinates($lat, $lng);
         $this->validateTermString($term);
 
-        return $this->makeRequest([
+        return $this->sendRequest($url, [
             'term' => $term,
             'lat' => $lat,
             'lng' => $lng,
-        ]);
+        ], ['Api-Key' => $this->apiKey], true);
+
+
     }
 
     /**
      * {@inheritdoc}
-     * @throws NeshanException
+     * @throws NeshanException|ConnectionException
      */
     public function findByProvince(string $term, string $province): array
     {

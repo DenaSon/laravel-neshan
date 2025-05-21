@@ -2,7 +2,9 @@
 
 namespace Denason\Neshan;
 
+use Denason\Neshan\Contracts\GeocodingInterface;
 use Denason\Neshan\Contracts\NeshanManagerInterface;
+use Denason\Neshan\Contracts\ReverseGeocodingInterface;
 use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Contracts\StaticMapInterface;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -54,9 +56,28 @@ class NeshanManager implements NeshanManagerInterface
      * {@inheritdoc}
      * @throws BindingResolutionException
      */
-    public function Search(): SearchInterface
+    public function search(): SearchInterface
     {
         return $this->app->make(SearchInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws BindingResolutionException
+     */
+    public function reverseGeocoding(): ReverseGeocodingInterface
+    {
+        return $this->app->make(ReverseGeocodingInterface::class);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     * @throws BindingResolutionException
+     */
+    public function geocoding(): GeocodingInterface
+    {
+        return $this->app->make(GeocodingInterface::class);
     }
 
 

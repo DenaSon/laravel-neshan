@@ -4,6 +4,7 @@ namespace Denason\Neshan\Services;
 
 use Denason\Neshan\Exceptions\NeshanException;
 use Denason\Neshan\Traits\ValidatesMapParameters;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -14,6 +15,42 @@ use Illuminate\Support\Facades\Http;
 abstract class BaseNeshanService
 {
     use ValidatesMapParameters;
+
+    //BaseUrl for all services
+    protected const BASE_URL = 'https://api.neshan.org';
+
+    //EndPoint Class: StaticMapService
+    protected const ENDPOINT_STATIC_MAP = '/v4/static?';
+    //EndPoint Class: StaticMapService
+    protected const ENDPOINT_STATIC_MAP_ARC = '/v4/static/arc?';
+    //EndPoint Class: SearchService
+    protected const ENDPOINT_SEARCH = '/v1/search?';
+    //EndPoint Class: ReverseGeocoding
+    protected const ENDPOINT_REVERSE_GEOCODING = '/v5/reverse?';
+
+    protected const ENDPOINT_GEOCODING = '/v6/geocoding?';
+    protected const ENDPOINT_DISTANCE = '/v1/distance-matrix?';
+    protected const ENDPOINT_ROUTING = '/v1/direction?';
+
+    protected string $apiKey;
+
+    /**
+     * Build full URL by appending endpoint to baseUrl safely.
+     *
+     * @param string $endpoint
+     * @return string
+     */
+
+    protected function buildEndpoint(string $endpoint): string
+    {
+        return rtrim($this->getBaseUrl(), '/') . '/' . ltrim($endpoint, '/');
+    }
+
+    public function __construct(string $apiKey)
+    {
+        $this->apiKey = $apiKey;
+    }
+
 
     /**
      * Build a URL-encoded query string from an array of parameters.
@@ -53,7 +90,7 @@ abstract class BaseNeshanService
     protected function sendSimpleRequest(string $url): string
     {
         try {
-            $response = Http::retry(2)->timeout(10)->get($url);
+            $response = Http::retry(2, 100)->timeout(10)->get($url);
 
             if ($response->failed()) {
                 throw new NeshanException("Request failed with status: " . $response->status());
@@ -76,15 +113,16 @@ abstract class BaseNeshanService
      * @param bool $asJson Whether to decode response as JSON (default false).
      * @return array<string, mixed>|string JSON decoded array or raw response body.
      *
-     * @throws NeshanException On HTTP failure or unexpected errors.
+     * @throws NeshanException|ConnectionException On HTTP failure or unexpected errors.
      */
     protected function sendRequest(string $endpoint, array $query = [], array $headers = [], bool $asJson = false): mixed
     {
         try {
             $response = Http::withHeaders($headers)
-                ->retry(2)
+                ->retry(2, 100)
                 ->timeout(10)
                 ->get($endpoint, $query);
+
 
             if ($response->failed()) {
                 throw new NeshanException(
@@ -95,7 +133,7 @@ abstract class BaseNeshanService
 
             return $asJson ? $response->json() : $response->body();
 
-        } catch (\Exception $e) {
+        } catch (NeshanException $e) {
             throw new NeshanException("Unexpected error occurred while requesting Neshan API.", 0, $e);
         }
     }
@@ -109,6 +147,8 @@ abstract class BaseNeshanService
      */
     protected function getBaseUrl(): string
     {
-        return 'https://api.neshan.org/v1';
+        return self::BASE_URL;
     }
+
+
 }
