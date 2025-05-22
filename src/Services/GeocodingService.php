@@ -29,7 +29,7 @@ class GeocodingService extends BaseNeshanService implements GeocodingInterface
         return $this->sendRequest(
             $url,
             ['address' => $address],
-            ['Api-Key' => $this->apiKey],
+            [],
             true
         );
     }
@@ -50,7 +50,7 @@ class GeocodingService extends BaseNeshanService implements GeocodingInterface
      *
      * @throws NeshanException
      */
-    public function Latitude(): float
+    public function latitude(): float
     {
         if (!$this->hasCachedResult()) {
             throw new NeshanException("Latitude not available. Call address() first.");
@@ -64,7 +64,7 @@ class GeocodingService extends BaseNeshanService implements GeocodingInterface
      *
      * @throws NeshanException
      */
-    public function Longitude(): float
+    public function longitude(): float
     {
         if (!$this->hasCachedResult()) {
             throw new NeshanException("Longitude not available. Call address() first.");

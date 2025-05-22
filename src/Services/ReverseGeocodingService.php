@@ -53,7 +53,7 @@ class ReverseGeocodingService extends BaseNeshanService implements ReverseGeocod
         return $this->sendRequest(
             $url,
             ['lat' => $lat, 'lng' => $lng],
-            ['Api-Key' => $this->apiKey],
+            [],
             true
         );
     }

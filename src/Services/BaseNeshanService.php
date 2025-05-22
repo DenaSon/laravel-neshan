@@ -29,8 +29,14 @@ abstract class BaseNeshanService
     protected const ENDPOINT_REVERSE_GEOCODING = '/v5/reverse?';
 
     protected const ENDPOINT_GEOCODING = '/v6/geocoding?';
+
+    //Endpoint Class DirectionService
+    protected const ENDPOINT_DIRECTION_WITH_TRAFFIC = '/v4/direction?';
+    //Endpoint Class DirectionService
+    protected const ENDPOINT_DIRECTION_WITHOUT_TRAFFIC = '/v4/direction/no-traffic?';
+
     protected const ENDPOINT_DISTANCE = '/v1/distance-matrix?';
-    protected const ENDPOINT_ROUTING = '/v1/direction?';
+
 
     protected string $apiKey;
 
@@ -118,11 +124,17 @@ abstract class BaseNeshanService
     protected function sendRequest(string $endpoint, array $query = [], array $headers = [], bool $asJson = false): mixed
     {
         try {
+
+
+            // Merge Api-Key into headers unless already provided
+            $headers = array_merge([
+                'Api-Key' => $this->apiKey,
+            ], $headers);
+
             $response = Http::withHeaders($headers)
                 ->retry(2, 100)
                 ->timeout(10)
                 ->get($endpoint, $query);
-
 
             if ($response->failed()) {
                 throw new NeshanException(
@@ -134,9 +146,11 @@ abstract class BaseNeshanService
             return $asJson ? $response->json() : $response->body();
 
         } catch (NeshanException $e) {
+
             throw new NeshanException("Unexpected error occurred while requesting Neshan API.", 0, $e);
         }
     }
+
 
     /**
      * Get the base URL for Neshan API.

@@ -2,15 +2,18 @@
 
 namespace Denason\Neshan;
 
+use Denason\Neshan\Contracts\DirectionInterface;
 use Denason\Neshan\Contracts\GeocodingInterface;
 use Denason\Neshan\Contracts\ReverseGeocodingInterface;
 use Denason\Neshan\Contracts\SearchInterface;
 use Denason\Neshan\Contracts\StaticMapInterface;
+use Denason\Neshan\Services\DirectionService;
 use Denason\Neshan\Services\GeocodingService;
 use Denason\Neshan\Services\ReverseGeocodingService;
 use Denason\Neshan\Services\SearchService;
 use Denason\Neshan\Services\StaticMapService;
 use Illuminate\Support\ServiceProvider;
+
 
 class NeshanServiceProvider extends ServiceProvider
 {
@@ -31,6 +34,9 @@ class NeshanServiceProvider extends ServiceProvider
         // Register GeocodingService
         $this->app->singleton(GeocodingInterface::class, fn() => new GeocodingService(config('neshan.service.api_key')));
 
+
+        // Register DirectionService
+        $this->app->singleton(DirectionInterface::class, fn() => new DirectionService(config('neshan.service.api_key')));
 
         // Optionally register a manager if using multiple services centrally
         $this->app->singleton(NeshanManager::class, function ($app) {

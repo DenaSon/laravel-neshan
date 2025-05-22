@@ -10,7 +10,7 @@ trait ValidatesMapParameters
      *
      * @throws NeshanException
      */
-    protected function validateCoordinates($lat, $lng): void
+    protected function validateCoordinates(float $lat, float $lng): void
     {
 
         if (is_null($lat) || is_null($lng)) {
@@ -37,6 +37,9 @@ trait ValidatesMapParameters
     }
 
 
+    /**
+     * @throws NeshanException
+     */
     protected function validateStaticMapArc(int $width, int $height, string $type): void
     {
         if ($width < 250 || $width > 2000) {
@@ -124,5 +127,60 @@ trait ValidatesMapParameters
             throw new NeshanException("Search term contains invalid characters.");
         }
     }
+
+    /**
+     * @throws NeshanException
+     */
+    protected function validateDegree($degree): void
+    {
+        if ($degree < 0 || $degree > 360) {
+            throw new NeshanException("Bearing must be between 0 and 360.");
+        }
+    }
+
+
+    /**
+     * @throws NeshanException
+     */
+    protected function validatePresenceOfOriginAndDestination(): void
+    {
+        if (!$this->origin || !$this->destination) {
+            throw new NeshanException("Both origin and destination must be set before calling get().");
+        }
+    }
+
+    /**
+     * @throws NeshanException
+     */
+    protected function validateTrafficCompatibility(): void
+    {
+        if ($this->useTraffic && $this->avoidTrafficZone) {
+            throw new NeshanException("Incompatible options: 'avoidTrafficZone' cannot be used with 'withTraffic()' if the destination may lie within a traffic zone. Use 'withoutTraffic()' instead.");
+        }
+    }
+
+    /**
+     * @throws NeshanException
+     */
+    protected function validateVehicleType(string $type): void
+    {
+        if (!in_array($type, ['car', 'motorcycle'], true)) {
+            throw new NeshanException("Invalid type value. Allowed values are 'car' or 'motorcycle'.");
+        }
+    }
+
+    /**
+     * @throws NeshanException
+     */
+    protected function validateWaypoint(array $coord): void
+    {
+        if (!is_array($coord) || count($coord) !== 2) {
+            throw new NeshanException("Each waypoint must be an array of [lat, lng].");
+        }
+
+        [$lat, $lng] = $coord;
+        $this->validateCoordinates($lat, $lng);
+    }
+
 
 }

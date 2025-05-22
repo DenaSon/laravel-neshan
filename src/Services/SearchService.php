@@ -32,6 +32,7 @@ class SearchService extends BaseNeshanService implements SearchInterface
     public function findByCoordinate(string $term, ?float $lat = 0, ?float $lng = 0): array
     {
         $url = $this->buildEndpoint(static::ENDPOINT_SEARCH);
+
         $this->validateCoordinates($lat, $lng);
         $this->validateTermString($term);
 
@@ -39,7 +40,7 @@ class SearchService extends BaseNeshanService implements SearchInterface
             'term' => $term,
             'lat' => $lat,
             'lng' => $lng,
-        ], ['Api-Key' => $this->apiKey], true);
+        ], [], true);
 
 
     }

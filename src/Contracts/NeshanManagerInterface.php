@@ -1,5 +1,9 @@
 <?php
+
 namespace Denason\Neshan\Contracts;
+
+
+
 interface NeshanManagerInterface
 {
     /**
@@ -29,4 +33,12 @@ interface NeshanManagerInterface
      * @return GeocodingInterface
      */
     public function geocoding(): GeocodingInterface;
+
+    /**
+     * Get the Coordinates By Address string
+     *
+     * @return DirectionInterface
+     */
+    public function direction(): DirectionInterface;
+
 }

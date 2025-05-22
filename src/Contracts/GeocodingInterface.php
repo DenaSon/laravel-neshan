@@ -31,7 +31,7 @@ interface GeocodingInterface
      * @return float
      * @throws NeshanException If no valid geocoding result is available.
      */
-    public function Latitude(): float;
+    public function latitude(): float;
 
     /**
      * Retrieves the longitude (X coordinate) of the previously set address.
@@ -39,7 +39,7 @@ interface GeocodingInterface
      * @return float
      * @throws NeshanException If no valid geocoding result is available.
      */
-    public function Longitude(): float;
+    public function longitude(): float;
 
     /**
      * Retrieves the geographic coordinates [latitude, longitude] of the address.
