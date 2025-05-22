@@ -35,13 +35,17 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
         $this->bearing = null;
         $this->useTraffic = true;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function withTraffic(): static
     {
         $this->useTraffic = true;
         return $this;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function withoutTraffic(): static
     {
         $this->useTraffic = false;
@@ -50,6 +54,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
 
     /**
      * @throws NeshanException
+     * {@inheritdoc}
      */
     public function origin(float $lat, float $lng): static
     {
@@ -60,6 +65,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
 
     /**
      * @throws NeshanException
+     * {@inheritdoc}
      */
     public function destination(float $lat, float $lng): static
     {
@@ -68,6 +74,10 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
         return $this;
     }
 
+    /**
+     * @throws NeshanException
+     * {@inheritdoc}
+     */
     public function type(string $type): static
     {
         $this->validateVehicleType($type);
@@ -79,6 +89,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
 
     /**
      * @param array<array{0: float, 1: float}> $points
+     * {@inheritdoc}
      */
     public function waypoints(array $points): static
     {
@@ -94,25 +105,33 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
         $this->waypoints = $formatted;
         return $this;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function avoidTrafficZone(): static
     {
         $this->avoidTrafficZone = true;
         return $this;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function avoidOddEvenZone(): static
     {
         $this->avoidOddEvenZone = true;
         return $this;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function alternative(): static
     {
         $this->alternative = true;
         return $this;
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function bearing(int $degrees): static
     {
        $this->validateDegree($degrees);
@@ -123,6 +142,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
 
     /**
      * @throws NeshanException|ConnectionException
+     * {@inheritdoc}
      */
     public function get(): array
     {
