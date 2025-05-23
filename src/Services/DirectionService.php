@@ -94,7 +94,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
     public function waypoints(array $points): static
     {
         $formatted = collect($points)->map(function ($coord) {
-            $this->validateWaypoint($coord);
+            $this->validateCoordinatePair($coord);
 
             [$lat, $lng] = $coord;
             $this->validateCoordinates($lat, $lng);
@@ -141,7 +141,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
     }
 
     /**
-     * @throws NeshanException|ConnectionException
+     * @throws NeshanException
      * {@inheritdoc}
      */
     public function get(): array
@@ -172,7 +172,7 @@ class DirectionService extends BaseNeshanService implements DirectionInterface
         if (!is_null($this->bearing)) $query['bearing'] = $this->bearing;
 
         try {
-            return $this->sendRequest($url, $query, [], true);
+            return $this->sendRequest($url, $query);
         } finally {
             $this->reset();
         }

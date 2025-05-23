@@ -4,7 +4,6 @@ namespace Denason\Neshan\Services;
 
 use Denason\Neshan\Exceptions\NeshanException;
 use Denason\Neshan\Traits\ValidatesMapParameters;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -34,6 +33,8 @@ abstract class BaseNeshanService
     protected const ENDPOINT_DIRECTION_WITH_TRAFFIC = '/v4/direction?';
     //Endpoint Class DirectionService
     protected const ENDPOINT_DIRECTION_WITHOUT_TRAFFIC = '/v4/direction/no-traffic?';
+
+    protected const ENDPOINT_MAP_MATCHING = '/v3/map-matching';
 
     protected const ENDPOINT_DISTANCE = '/v1/distance-matrix?';
 
@@ -114,27 +115,38 @@ abstract class BaseNeshanService
      * Can return JSON-decoded array if `$asJson` is true, otherwise raw body string.
      *
      * @param string $endpoint API endpoint (full URL or relative path).
-     * @param array<string, mixed> $query Optional query parameters.
+     * @param array $payload
      * @param array<string, string> $headers Optional HTTP headers.
+     * @param string $method
      * @param bool $asJson Whether to decode response as JSON (default false).
-     * @return array<string, mixed>|string JSON decoded array or raw response body.
+     * @return string|array<string, mixed> JSON decoded array or raw response body.
      *
-     * @throws NeshanException|ConnectionException On HTTP failure or unexpected errors.
+     * @throws NeshanException On HTTP failure or unexpected errors.
      */
-    protected function sendRequest(string $endpoint, array $query = [], array $headers = [], bool $asJson = false): mixed
+    protected function sendRequest(
+        string $endpoint,
+        array $payload = [],
+        array $headers = [],
+        string $method = 'GET',
+        bool $asJson = true
+    ): string|array
     {
         try {
-
-
             // Merge Api-Key into headers unless already provided
             $headers = array_merge([
                 'Api-Key' => $this->apiKey,
             ], $headers);
 
-            $response = Http::withHeaders($headers)
+            $client = Http::withHeaders($headers)
                 ->retry(2, 100)
-                ->timeout(10)
-                ->get($endpoint, $query);
+                ->timeout(10);
+
+            $response = match (strtoupper($method)) {
+                'POST' => $client->post($endpoint, $payload),
+                'PUT' => $client->put($endpoint, $payload),
+                'DELETE' => $client->delete($endpoint, $payload),
+                default => $client->get($endpoint, $payload),
+            };
 
             if ($response->failed()) {
                 throw new NeshanException(
@@ -143,13 +155,20 @@ abstract class BaseNeshanService
                 );
             }
 
-            return $asJson ? $response->json() : $response->body();
+            if ($asJson) {
+                $jsonResponse = $response->json();
+                return $this->ValidateJsonArray($jsonResponse);
+            }
 
-        } catch (NeshanException $e) {
+            return $response->body();
 
+        } catch (\Throwable $e) {
             throw new NeshanException("Unexpected error occurred while requesting Neshan API.", 0, $e);
         }
     }
+
+
+
 
 
     /**

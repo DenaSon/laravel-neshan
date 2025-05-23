@@ -40,5 +40,11 @@ interface NeshanManagerInterface
      * @return DirectionInterface
      */
     public function direction(): DirectionInterface;
+    /**
+     * Map Match Service
+     *
+     * @return MapMatchingInterface
+     */
+    public function mapMatching(): MapMatchingInterface;
 
 }

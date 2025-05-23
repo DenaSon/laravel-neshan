@@ -42,7 +42,6 @@ class ReverseGeocodingService extends BaseNeshanService implements ReverseGeocod
 
     /**
      * @throws NeshanException
-     * @throws ConnectionException
      */
     public function getInfo(float $lat, float $lng): array
     {
@@ -52,9 +51,7 @@ class ReverseGeocodingService extends BaseNeshanService implements ReverseGeocod
 
         return $this->sendRequest(
             $url,
-            ['lat' => $lat, 'lng' => $lng],
-            [],
-            true
+            ['lat' => $lat, 'lng' => $lng]
         );
     }
 

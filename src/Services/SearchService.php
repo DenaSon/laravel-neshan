@@ -27,7 +27,7 @@ class SearchService extends BaseNeshanService implements SearchInterface
 
     /**
      * {@inheritdoc}
-     * @throws NeshanException|ConnectionException
+     * @throws NeshanException
      */
     public function findByCoordinate(string $term, ?float $lat = 0, ?float $lng = 0): array
     {
@@ -40,8 +40,7 @@ class SearchService extends BaseNeshanService implements SearchInterface
             'term' => $term,
             'lat' => $lat,
             'lng' => $lng,
-        ], [], true);
-
+        ]);
 
     }
 

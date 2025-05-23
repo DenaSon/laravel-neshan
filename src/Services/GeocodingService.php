@@ -18,7 +18,7 @@ class GeocodingService extends BaseNeshanService implements GeocodingInterface
     /**
      * Get full geocoding result (non-fluent).
      *
-     * @throws NeshanException|ConnectionException
+     * @throws NeshanException
      */
     public function getCode(string $address): array
     {
@@ -28,9 +28,7 @@ class GeocodingService extends BaseNeshanService implements GeocodingInterface
 
         return $this->sendRequest(
             $url,
-            ['address' => $address],
-            [],
-            true
+            ['address' => $address]
         );
     }
 

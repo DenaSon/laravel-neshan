@@ -172,14 +172,28 @@ trait ValidatesMapParameters
     /**
      * @throws NeshanException
      */
-    protected function validateWaypoint(array $coord): void
+    protected function validateCoordinatePair(array $coord): void
     {
         if (!is_array($coord) || count($coord) !== 2) {
-            throw new NeshanException("Each waypoint must be an array of [lat, lng].");
+            throw new NeshanException("Each coordinate must be an array of [lat, lng].");
         }
 
-        [$lat, $lng] = $coord;
-        $this->validateCoordinates($lat, $lng);
+    }
+
+    /**
+     *
+     * @param mixed $jsonResponse
+     * @return array
+     * @throws NeshanException
+     */
+    protected function ValidateJsonArray(mixed $jsonResponse): array
+    {
+        if (!is_array($jsonResponse)) {
+            throw new NeshanException(
+                "Invalid API response format: expected JSON array, got " . gettype($jsonResponse)
+            );
+        }
+        return $jsonResponse;
     }
 
 

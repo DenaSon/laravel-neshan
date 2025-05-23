@@ -4,6 +4,8 @@ namespace Denason\Neshan;
 
 use Denason\Neshan\Contracts\DirectionInterface;
 use Denason\Neshan\Contracts\GeocodingInterface;
+use Denason\Neshan\Contracts\MapMatchingInterface;
+use Denason\Neshan\Contracts\MapMatchingServiceInterface;
 use Denason\Neshan\Contracts\NeshanManagerInterface;
 use Denason\Neshan\Contracts\ReverseGeocodingInterface;
 use Denason\Neshan\Contracts\SearchInterface;
@@ -89,6 +91,15 @@ class NeshanManager implements NeshanManagerInterface
     public function direction(): DirectionInterface
     {
         return $this->app->make(DirectionInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws BindingResolutionException
+     */
+    public function mapMatching(): MapMatchingInterface
+    {
+        return $this->app->make(MapMatchingInterface::class);
     }
 
 
