@@ -56,12 +56,12 @@ class NeshanServiceProvider extends ServiceProvider
             __DIR__ . '/Config/neshan.php' => config_path('neshan.php'),
         ], 'config');
 
-        // Load helpers if available
+        // Load helpers
         if (file_exists(__DIR__ . '/Helpers/ResponseFormatter.php')) {
             require_once __DIR__ . '/Helpers/ResponseFormatter.php';
         }
 
 
-        $this->loadRoutesFrom(__DIR__ . '/Routes/web.php');
+       // $this->loadRoutesFrom(__DIR__ . '/Routes/web.php');
     }
 }
