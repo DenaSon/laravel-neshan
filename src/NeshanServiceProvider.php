@@ -51,10 +51,10 @@ class NeshanServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Publish a config file
         $this->publishes([
             __DIR__ . '/Config/neshan.php' => config_path('neshan.php'),
-        ], 'config');
+        ], 'neshan-config');
+
 
         // Load helpers
         if (file_exists(__DIR__ . '/Helpers/ResponseFormatter.php')) {
