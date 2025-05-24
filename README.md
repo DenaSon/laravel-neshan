@@ -29,8 +29,8 @@ composer require denason/laravel-neshan
 
 ```env
 NESHAN_API_BASE_URL=https://api.neshan.org
-NESHAN_MAP_API_KEY=service.f0b032318487462a8dfa467aff93408a
-NESHAN_SERVICE_API_KEY=service.a53814e21deb45bfa47e97804674b1b2
+NESHAN_MAP_API_KEY=
+NESHAN_SERVICE_API_KEY=
 ```
 
 سپس فایل پیکربندی را منتشر کنید:
