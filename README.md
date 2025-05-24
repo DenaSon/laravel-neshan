@@ -1,101 +1,91 @@
-# 📍 نقشه نشان برای لاراول
 
-یک پکیج کاربردی برای استفاده از سرویس نقشه ایستای نشان در فریم‌ورک Laravel.  
-این پکیج به شما امکان می‌دهد به سادگی با چند خط کد، نقشه‌های ایستا بسازید و تصویر آن‌ها را دریافت کنید.
+---
 
+````markdown
+# 📦 Laravel Neshan
 
+پکیج `laravel-neshan` یک واسط قدرتمند، توسعه‌پذیر و قابل اطمینان برای تعامل با [API نقشه نشان](https://developers.neshan.org) در فریم‌ورک Laravel است. این پکیج با رویکرد مهندسی‌ شده طراحی شده و تمامی سرویس‌های کلیدی ارائه‌شده توسط نقشه نشان را پوشش می‌دهد.
 
-## 🚀 نصب پکیج
+---
 
-برای نصب پکیج از طریق Composer دستور زیر را اجرا کنید:
+## ✅ امکانات پشتیبانی‌شده
+
+- 🗺️ Static Map
+- 📍 Geocoding (تبدیل آدرس به مختصات)
+- 🧭 Reverse Geocoding (تبدیل مختصات به آدرس)
+- 🔎 Search (جستجوی متنی)
+- 🚦 Direction (مسیریابی با و بدون ترافیک)
+- 📊 Map Matching (نگاشت مسیر به نقاط GPS)
+
+---
+
+## ⚙️ نصب
 
 ```bash
 composer require denason/laravel-neshan
-```
+````
 
 ---
 
-## ⚙️ پیکربندی
+## 🔐 پیکربندی
 
-مقادیر کلید API و آدرس پایه API را در فایل `.env` پروژه خود تنظیم کنید:
-دریافت کلید دسترسی به API : https://platform.neshan.org/api/getting-started/
+مقادیر زیر را به فایل `.env` خود اضافه کنید:
+
 ```env
-NESHAN_STATIC_MAP_API_KEY=کلید-شخصی-شما
-NESHAN_STATIC_MAP_BASE_URL=https://api.neshan.org/v4/static
+NESHAN_API_BASE_URL=https://api.neshan.org
+NESHAN_MAP_API_KEY=service.f0b032318487462a8dfa467aff93408a
+NESHAN_SERVICE_API_KEY=service.a53814e21deb45bfa47e97804674b1b2
 ```
 
+برای انتشار فایل پیکربندی:
 
-ساختار فایل پیکربندی `config/neshan.php` به شکل زیر است:
-
-```php
-'static_map' => [
-    'api_key' => env('NESHAN_STATIC_MAP_API_KEY'),
-    'base_url' => env('NESHAN_STATIC_MAP_BASE_URL', 'https://api.neshan.org/v4/static'),
-],
+```bash
+php artisan vendor:publish --tag=neshan-config
 ```
 
 ---
 
-## ✅ نحوه استفاده
-
-### استفاده از Facade
+## 🚀 استفاده سریع از سرویس مسیریابی (Direction)
 
 ```php
 use Denason\Neshan\Facades\Neshan;
 
-$lat = 35.6692;
-$lng = 51.3890;
-
-$url = Neshan::staticMap()->generate($lat, $lng);
-$image = Neshan::staticMap()->fetchImage($url);
-
-return response($image)->header('Content-Type', 'image/png');
+$response = Neshan()
+    ->direction()
+    ->origin(35.6892, 51.3890)
+    ->destination(35.7000, 51.4000)
+    ->type('car') // انتخاب نوع وسیله نقلیه (car, motor, truck)
+    ->withTraffic() // یا ->withoutTraffic()
+    ->avoidOddEvenZone()
+    ->avoidTrafficZone()
+    ->alternative()
+    ->bearing(90)
+    ->get();
 ```
 
-### استفاده از Helper
+> پاسخ به‌صورت آرایه PHP شامل اطلاعات کامل مسیر خواهد بود.
 
-```php
-$url = staticMap()->generate(35.6892, 51.3890);
-```
 
----
 
-## 📦 امکانات پکیج
+## 📂 ساختار پوشه‌ها
 
-* تولید لینک نقشه  با قابلیت تنظیم پارامترهای مختلف مانند زوم، اندازه و نوع نقشه
-* دریافت مستقیم تصویر نقشه در قالب PNG
-* اعتبارسنجی ورودی‌ها برای جلوگیری از خطاهای رایج
-* پیاده‌سازی اصول SOLID و ساختار ماژولار
-* یکپارچگی کامل با معماری لاراول شامل Service Provider، Facade، Helper و Config
+
 
 ---
 
-## 📌 نقشه راه توسعه
+## 📚 مستندات کامل
 
-در نسخه‌های بعدی قصد داریم امکانات زیر را اضافه کنیم:
+مستندات کامل بزودی در بخش wiki قرار میگیرد
+---
 
-* سرویس جستجو (Search)
-* موقعیت‌یابی معکوس (Reverse Geocoding)
-* مسیریابی (Routing)
-* مدیریت همزمان چند سرویس از طریق ساختار Service Tag
+## 🪪 مجوز
+
+پروانه نرم‌افزار آزاد [MIT License](LICENSE).
 
 ---
 
-## 🧪 تست
+## 🤝 مشارکت
 
-برای اجرای تست‌ها دستور زیر را اجرا کنید:
-
-```bash
-php artisan test
-```
-
-توجه داشته باشید برای اجرای موفق تست‌ها به کلید API معتبر در فایل `.env` نیاز دارید.
-
----
-
-## 📝 مجوز
-
-این پکیج تحت مجوز MIT به صورت متن‌باز ارائه شده است.
-© توسعه یافته توسط Denason
+Pull Request و Issue پذیرفته می‌شود. لطفاً پیش از آن، [Contribution Guide](CONTRIBUTING.md) را مطالعه کنید.
 
 
